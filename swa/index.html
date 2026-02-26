@@ -80,22 +80,24 @@
     }
 
     function startEmu(romUrl) {
-      // Nettoyage si relance 
+      // 🔹 Nettoyage si relance
       document.getElementById("game").innerHTML = "";
 
-      // Configuration EmulatorJS (exemple NES) 
-      // Doc + exemples: :contentReference[oaicite:9]{index=9} 
+      // 🔹 Configuration de base EmulatorJS
       window.EJS_player = "#game";
-      window.EJS_core = "nestopia";       // NES 
-      window.EJS_gameUrl = romUrl;        // /api/roms/xxx.nes (proxy via SWA) 
-      window.EJS_pathtodata = "https://www.emulatorjs.com/data/"; // assets emulator 
+      window.EJS_core = "nestopia";
+      window.EJS_gameUrl = romUrl;
+      window.EJS_pathtodata = "https://www.emulatorjs.com/data/";
+
+      // 🔹 Désactivation des shaders / effets pour réduire les plantages GPU
       window.EJS_shaderEnable = false;
       window.EJS_videoSmooth = false;
 
-      // ⚡ Augmentation de la mémoire pour WASM
+      // 🔹 Mémoire WASM maximum sûre pour desktop : 512 Mo
       window.Module = window.Module || {};
-      window.Module.TOTAL_MEMORY = 512 * 1024 * 1024; // 256 Mo, augmenter si nécessaire
+      window.Module.TOTAL_MEMORY = 512 * 1024 * 1024; // 512 Mo
 
+      // 🔹 Chargement du loader EmulatorJS
       const s = document.createElement("script");
       s.src = "https://www.emulatorjs.com/loader.js";
       document.body.appendChild(s);
