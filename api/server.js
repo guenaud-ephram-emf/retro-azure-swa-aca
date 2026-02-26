@@ -20,17 +20,24 @@ app.get("/api/games", (req, res) => {
   const files = fs.existsSync(romsDir) ? fs.readdirSync(romsDir) : [];
   const games = files
     .filter(f => /\.(nes|gb|gbc|gba|sfc|smc|zip)$/i.test(f))
-    .map(f => ({ id: f, title: f.replace(/\.(\w+)$/, ""), rom: `/api/roms/${f}` }));
+    .map(f => ({
+      id: f,
+      title: f.replace(/\.(\w+)$/, ""),
+      rom: `/api/roms/${encodeURIComponent(f)}`
+    }));
 
   res.json({ games });
 });
 
 app.get("/api/roms/:file", (req, res) => {
-  const file = req.params.file;
+  const file = decodeURIComponent(req.params.file);
   const fullPath = path.join(romsDir, file);
 
-  if (!fullPath.startsWith(romsDir)) return res.status(400).send("Bad path");
-  if (!fs.existsSync(fullPath)) return res.status(404).send("ROM not found");
+  if (!fullPath.startsWith(romsDir))
+    return res.status(400).send("Bad path");
+
+  if (!fs.existsSync(fullPath))
+    return res.status(404).send("ROM not found");
 
   res.sendFile(fullPath);
 });
