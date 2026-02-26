@@ -1,0 +1,6 @@
+######################################
+# Fichiers à ignorer lors des push git
+######################################
+
+# Les fichiers dans node_modules qu'on peut installer avec la commande 'npm ci' et mettre à jour avec la commande 'npm update'
+api/node_modules/*
