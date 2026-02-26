@@ -31,15 +31,45 @@ app.get("/api/games", (req, res) => {
 
 app.get("/api/roms/:file", (req, res) => {
   const file = decodeURIComponent(req.params.file);
-  const fullPath = path.join(romsDir, file);
+  const filePath = path.join(romsDir, file);
 
-  if (!fullPath.startsWith(romsDir))
+  if (!filePath.startsWith(romsDir))
     return res.status(400).send("Bad path");
 
-  if (!fs.existsSync(fullPath))
+  if (!fs.existsSync(filePath))
     return res.status(404).send("ROM not found");
 
-  res.sendFile(fullPath);
+  const stat = fs.statSync(filePath);
+  const fileSize = stat.size;
+  const range = req.headers.range;
+
+  if (range) {
+    const parts = range.replace(/bytes=/, "").split("-");
+    const start = parseInt(parts[0], 10);
+    const end = parts[1]
+      ? parseInt(parts[1], 10)
+      : fileSize - 1;
+
+    const chunkSize = end - start + 1;
+    const fileStream = fs.createReadStream(filePath, { start, end });
+
+    res.writeHead(206, {
+      "Content-Range": `bytes ${start}-${end}/${fileSize}`,
+      "Accept-Ranges": "bytes",
+      "Content-Length": chunkSize,
+      "Content-Type": "application/octet-stream"
+    });
+
+    fileStream.pipe(res);
+  } else {
+    res.writeHead(200, {
+      "Content-Length": fileSize,
+      "Content-Type": "application/octet-stream",
+      "Accept-Ranges": "bytes"
+    });
+
+    fs.createReadStream(filePath).pipe(res);
+  }
 });
 
 app.listen(port, () => console.log(`Retro API listening on :${port}`));

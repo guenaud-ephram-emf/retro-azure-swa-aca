@@ -89,6 +89,12 @@
       window.EJS_core = "nestopia";       // NES 
       window.EJS_gameUrl = romUrl;        // /api/roms/xxx.nes (proxy via SWA) 
       window.EJS_pathtodata = "https://www.emulatorjs.com/data/"; // assets emulator 
+      window.EJS_shaderEnable = false;
+      window.EJS_videoSmooth = false;
+
+      // ⚡ Augmentation de la mémoire pour WASM
+      window.Module = window.Module || {};
+      window.Module.TOTAL_MEMORY = 256 * 1024 * 1024; // 256 Mo, augmenter si nécessaire
 
       const s = document.createElement("script");
       s.src = "https://www.emulatorjs.com/loader.js";
